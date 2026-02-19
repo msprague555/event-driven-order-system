@@ -1,5 +1,6 @@
 package com.matthewsprague.orderservice.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Queue;
@@ -9,13 +10,22 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@RequiredArgsConstructor
 public class RabbitConfig {
     public static final String ORDER_EXCHANGE = "order.exchange";
-    public static final String ORDER_CREATED_QUEUE = "order.created.queue";
+    public static final String ORDER_RESERVED_QUEUE = "order.reserved.queue";
+    //Inventory exchange to update order status based on inventory event
+    public static final String INVENTORY_EXCHANGE = "inventory.exchange";
+    public static final String INVENTORY_RESERVED_KEY = "inventory.reserved";
     
     @Bean
     public Jackson2JsonMessageConverter jackson2JsonMessageConverter() {
         return new Jackson2JsonMessageConverter();
+    }
+    
+    @Bean
+    TopicExchange inventoryExchange(){
+        return new TopicExchange(INVENTORY_EXCHANGE);
     }
     
     @Bean
@@ -24,14 +34,14 @@ public class RabbitConfig {
     }
     
     @Bean
-    public Queue orderCreatedQueue(){
-        return new Queue(ORDER_CREATED_QUEUE);
+    public Queue orderReservedQueue(){
+        return new Queue(ORDER_RESERVED_QUEUE);
     }
     
     @Bean
-    public Binding orderCreatedBinding(Queue orderCreatedQueue, TopicExchange orderExchange){
-        return BindingBuilder.bind(orderCreatedQueue)
-                             .to(orderExchange)
-                             .with("order.created");
+    public Binding orderCreatedBinding(){
+        return BindingBuilder.bind(orderReservedQueue())
+                             .to(inventoryExchange())
+                             .with(INVENTORY_RESERVED_KEY);
     }
 }

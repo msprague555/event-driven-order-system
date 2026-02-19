@@ -6,6 +6,7 @@ import com.matthewsprague.orderservice.api.CreateOrderRequest;
 import com.matthewsprague.orderservice.event.OrderCreatedEvent;
 import com.matthewsprague.orderservice.repository.OrderRepository;
 import java.time.Instant;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 
@@ -21,6 +22,7 @@ public class OrderService {
     }
     public Order createOrder(CreateOrderRequest req){
         Order order = new Order();
+        order.setId(UUID.randomUUID().toString());
         order.setCustomerId(req.customerId());
         order.setTotalAmount(req.totalAmount());
         order.setStatus(OrderStatus.CREATED);
