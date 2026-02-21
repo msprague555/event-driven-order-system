@@ -10,7 +10,7 @@ Event-driven Order microservice built with Spring Boot and RabbitMQ
 
 ## Tech Stack
 
-- Java 17
+- Java 21
 - Spring Boot
 - Spring Data JPA
 - RabbitMQ
